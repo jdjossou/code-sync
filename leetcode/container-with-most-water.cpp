@@ -1,24 +1,17 @@
 class Solution {
 public:
     int maxArea(vector<int>& height) {
-        int start = 0;
-        int end = height.size() - 1;
+        int left = 0;
+        int right = height.size() - 1;
 
-        int maxArea = min(height.at(start), height.at(end)) * (end - start);
+        int maxArea = 0;
 
-        while (start < end) {
-        
-            if (height.at(start) <= height.at(end)) {
-                ++start;
-            } else {
-                --end;
-            }
+        while (left < right) {
+            maxArea = max(maxArea, min(height[left], height[right]) * (right - left));
 
-            const int area = min(height.at(start), height.at(end)) * (end - start);
-
-            if (area > maxArea) {
-                maxArea = area;
-            }
+            if (height[left] < height[right]) ++left;
+            else --right;
+            
         }
 
         return maxArea;
