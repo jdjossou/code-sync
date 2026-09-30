@@ -1,20 +1,16 @@
 class Solution {
 public:
     bool canConstruct(string ransomNote, string magazine) {
-        unordered_map<string, int> letters;
+        vector<int> count(26, 0);
 
-        for (int i = 0; i < magazine.length(); ++i) {
-            const string c = magazine.substr(i, 1);
-            letters[c] += 1;
+        for (char c : magazine) {
+            ++count[c - 'a'];
         }
 
-        for (int i = 0; i < ransomNote.length(); ++i) {
-            const string c = ransomNote.substr(i, 1);
-            if (letters[c] < 1) {
-                return false;
-            } else {
-                --letters[c];
-            }
+        for (char c : ransomNote) {
+            --count[c - 'a'];
+
+            if (count[c - 'a'] < 0) return false;
         }
 
         return true;
