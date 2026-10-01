@@ -1,64 +1,50 @@
 class Solution {
 public:
     int orangesRotting(vector<vector<int>>& grid) {
-        int time = 0;
-        int freshOranges = 0;
-        queue<pair<int, int>> q;
         
-        for (int m = 0; m < grid.size(); ++m) {
-            for (int n = 0; n < grid.at(0).size(); ++n) {
-                if (grid.at(m).at(n) == 1) {
-                    ++freshOranges;
-                } else if (grid.at(m).at(n) == 2) {
-                    q.push({m, n});
+        queue<array<int,3>> rotten;
+        int freshCount = 0;
+
+        const int m = grid.size();
+        const int n = grid.front().size(); 
+
+        for (int r = 0; r < m; ++r) {
+            for (int c = 0; c < n; ++c) {
+                if (grid[r][c] == 1) {
+                    ++freshCount;
+                } else if (grid[r][c] == 2) {
+                    rotten.push({r, c, 0});
                 }
             }
         }
 
-        while (!q.empty() && freshOranges > 0) {
+        const vector<pair<int,int>> DIR = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
 
-            const int len = q.size();
+        int timer = 0;
 
-            for (int i = 0; i < len; ++i) {
-                contaminate(grid, q, freshOranges);
+        while (!rotten.empty()) {
+            array<int,3> coord = rotten.front();
+            rotten.pop();
+
+            int r = coord[0];
+            int c = coord[1];
+            int time = coord[2];
+
+            timer = max(time, timer);
+
+            for (const auto& [dr, dc] : DIR) {
+                int nr = r + dr;
+                int nc = c + dc;
+
+                if (nr >= 0 && nr < m && nc >= 0 && nc < n && grid[nr][nc] == 1) {
+                    grid[nr][nc] = 2;
+                    --freshCount;
+                   rotten.push({nr, nc, time + 1}); 
+                }
             }
 
-            ++time;
         }
 
-        return freshOranges > 0 ? -1 : time;
-    }
-
-    void contaminate(vector<vector<int>>& grid, queue<pair<int,int>>& q, int& fresh) {
-        const pair<int, int> rotten = q.front();
-        q.pop();
-
-        // LEFT
-        if (rotten.first > 0 && grid.at(rotten.first - 1).at(rotten.second) == 1) {
-            grid.at(rotten.first - 1).at(rotten.second) = 2;
-            q.push({rotten.first - 1, rotten.second});
-            --fresh;
-        }
-
-        // RIGHT
-        if (rotten.first < grid.size() - 1 && grid.at(rotten.first + 1).at(rotten.second) == 1) {
-            grid.at(rotten.first + 1).at(rotten.second) = 2;
-            q.push({rotten.first + 1, rotten.second});
-            --fresh;
-        }
-
-        // BOTTOM
-        if (rotten.second < grid.at(0).size() - 1 && grid.at(rotten.first).at(rotten.second + 1) == 1) {
-            grid.at(rotten.first).at(rotten.second + 1) = 2;
-            q.push({rotten.first, rotten.second + 1});
-            --fresh;
-        }
-
-        // TOP
-        if (rotten.second > 0 && grid.at(rotten.first).at(rotten.second - 1) == 1) {
-            grid.at(rotten.first).at(rotten.second - 1) = 2;
-            q.push({rotten.first, rotten.second - 1});
-            --fresh;
-        } 
+        return freshCount == 0 ? timer : -1;
     }
 };
