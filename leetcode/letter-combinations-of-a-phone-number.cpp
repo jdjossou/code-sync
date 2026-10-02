@@ -1,46 +1,30 @@
 class Solution {
 public:
     vector<string> letterCombinations(string digits) {
+        
+        vector<vector<char>> letters = {{'a', 'b', 'c'}, {'d', 'e', 'f'}, {'g', 'h', 'i'}, {'j','k', 'l'}, 
+                                        {'m', 'n', 'o'}, {'p', 'q', 'r', 's'}, {'t', 'u', 'v'}, {'w', 'x', 'y', 'z'}};
+
         vector<string> res;
-        string s;
+        string str;
 
-        backtrack(digits, res, s, 0);
+        auto helper = [&](this auto self, const string& d) {
+            if (d.empty()) {
+                res.push_back(str);
+                return ;
+            }
 
-        return res;   
-    }
+            int digit = d.front() - '2';
 
-    void backtrack(const string& digits, vector<string>& res, string& s, int index) {
-        if (index == digits.length()) {
-            res.push_back(s);
+            for (char c : letters[digit]) {
+                str.push_back(c);
+                self(d.substr(1));
+                str.pop_back();
+            }
+        };
 
-            return ;
-        }
+        helper(digits);
 
-        const int digit = stoi(digits.substr(index, 1));
-        char start = 'a';
-        char end;
-
-        if (digit < 7) {
-            start += (digit - 2)*3;
-            end = start + 3;
-        } else if (digit == 7) {
-            start = 'p';
-            end = start + 4;
-        } else if (digit == 8) {
-            start = 't';
-            end = start + 3;
-        } else {
-            start = 'w';
-            end = start + 4;
-        }
-
-
-        while (start < end) {
-            s += start;
-            backtrack(digits, res, s, index + 1);
-            s = s.substr(0, s.length() - 1);
-
-            ++start;
-        }
+        return res;
     }
 };
