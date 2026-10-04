@@ -1,6 +1,7 @@
 class TimeMap {
 private:
-    unordered_map<string, vector<pair<string, int>>> timeMap;
+    
+    unordered_map<string, vector<pair<int, string>>> data;
 
 public:
     TimeMap() {
@@ -8,36 +9,32 @@ public:
     }
     
     void set(string key, string value, int timestamp) {
-        if (timeMap.find(key) == timeMap.end()) {
-            timeMap[key] = {};
-        }
-        
-        timeMap[key].push_back({value, timestamp});
+        data[key].emplace_back(timestamp, value);
     }
     
-    string get(string key, int timestamp) {        
-        if (timeMap.find(key) == timeMap.end()) {
+    string get(string key, int timestamp) {
+
+        if (!data.contains(key)) return "";
+
+        const vector<pair<int, string>>& vec = data[key];
+
+        auto it = upper_bound(vec.begin(), vec.end(), timestamp, 
+                [](int t, const pair<int, string>& p) {
+                    return t < p.first;
+                });
+
+        if (it == vec.begin()) {
             return "";
-        } 
-
-        int start = 0;
-        int end = timeMap[key].size() - 1;
-
-        while (end >= start) {
-            const int index = (start + end)/2;
-            const auto p = timeMap[key].at(index);
-
-            if (p.second == timestamp) {
-                return p.first;
-            } else if (p.second > timestamp) {
-                end = index - 1;
-            } else if (index == end || timeMap[key].at(index + 1).second > timestamp) {
-                return p.first;
-            } else {
-                start = index + 1;
-            }
+        } else {
+            --it;
+            return it->second;
         }
-
-        return "";
     }
 };
+
+/**
+ * Your TimeMap object will be instantiated and called as such:
+ * TimeMap* obj = new TimeMap();
+ * obj->set(key,value,timestamp);
+ * string param_2 = obj->get(key,timestamp);
+ */
