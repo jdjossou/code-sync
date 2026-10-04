@@ -12,21 +12,23 @@
 class Solution {
 public:
     int diameterOfBinaryTree(TreeNode* root) {
-        int res = 0;
+        int maxPath = 0;
 
-        dfs(root, res);
+        auto dfs = [&maxPath](this auto self, TreeNode* node) -> int {
 
-        return res;
-    }
+            if (node == nullptr) return 0;
+            
+            int heightLeft = self(node->left);
+            int heightRight = self(node->right);
 
-    int dfs(TreeNode* root, int& res) {
-        if (!root) return 0;
+            maxPath = max(maxPath, heightLeft + heightRight);
 
-        const int left = dfs(root->left, res);
-        const int right = dfs(root->right, res);
+            return max(heightLeft, heightRight) + 1;
 
-        res = max(res, left + right);
+        };
 
-        return 1 + max(left, right);
+        dfs(root);
+
+        return maxPath;
     }
 };
