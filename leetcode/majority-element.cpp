@@ -1,21 +1,22 @@
 class Solution {
 public:
     int majorityElement(vector<int>& nums) {
-        const int majority = nums.size()/2;
-        unordered_map<int, int> count;
-
-        for (int num : nums) {
-            if (count.find(num) == count.end()) {
-                count[num] = 0;
+        int count = 1;
+        int mostFreq = nums.front();
+        
+        for (int i = 1; i < nums.size(); ++i) {
+            if (nums[i] == mostFreq) {
+                ++count;
+            } else {
+                --count;
+                if (count == 0) {
+                    mostFreq = nums[i];
+                    count = 1;
+                }
             }
-            
-            ++count[num];
 
-            if (count[num] > majority) {
-                return num;
-            }
         }
 
-        return 0;
+        return mostFreq;
     }
 };
