@@ -6,19 +6,23 @@ public:
         if (sum % 2 == 1) return false;
 
         int target = sum / 2;
-        unordered_set<int> dp = {0};
-        unordered_set<int> nextDP = {0};
+        vector<bool> cache(target + 1, false);
+        vector<bool> cp(target + 1, false);
 
-        for (int i = nums.size() - 1; i >= 0; --i) {
+        cache.front() = true;
+        cp.front() = true;
 
-            for (int t : dp) {
-                nextDP.insert(t);
-                if (t + nums[i] <= target) nextDP.insert(t + nums[i]);
+        for (int i = 0; i < nums.size(); ++i) {
+                        
+            for (int j = 0; j < cache.size(); ++j) {
+                if (!cache[j]) continue; 
+                cp[j] = true;
+                if (nums[i] + j <= target) cp[nums[i] + j] = true;
             }
 
-            dp.swap(nextDP);
+            cache.swap(cp);
         }
 
-        return dp.contains(target);
+        return cache[target];
     }
 };
