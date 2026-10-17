@@ -14,9 +14,9 @@ public:
             int ac = aIdx >= 0 ? a[aIdx] - '0' : 0;
             int bc = bIdx >= 0 ? b[bIdx] - '0' : 0;
 
-            pair<char, int> res = add(ac, bc, extra);
-            extra = res.second;
-            s[sIdx] = res.first;
+            int res = ac + bc + extra;
+            s[sIdx] = (res % 2) + '0';
+            extra = res / 2;
 
             --sIdx;
             --aIdx;
@@ -24,16 +24,5 @@ public:
         }
 
         return s.front() == '0' ? s.substr(1) : s;
-    }
-
-    pair<char, int> add(bool a, bool b, int extra) {
-        if (a && b) {
-            return {extra + '0', 1};
-        } else if ((!a && b) || (a && !b)) {
-            if (extra == 0) return {'1', 0};
-            else return {'0', 1};
-        } else {
-            return {extra + '0', 0};
-        }
     }
 };
