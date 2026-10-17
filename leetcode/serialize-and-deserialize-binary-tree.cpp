@@ -16,10 +16,10 @@ public:
 
         auto dfs = [&res](this auto self, TreeNode* node) {
             if (node == nullptr) {
-                res.push_back('N');
+                res.push_back('n');
                 res.push_back(',');
 
-                return ;
+                return;
             }
 
             res += to_string(node->val);
@@ -30,27 +30,25 @@ public:
         };
 
         dfs(root);
-        res.pop_back();
-
         return res;
     }
 
     // Decodes your encoded data to tree.
     TreeNode* deserialize(string data) {
-
+        
+        string token;
         istringstream ss{data};
-        string valStr;
+        auto buildTree = [&token, &ss](this auto self) -> TreeNode* {
+            getline(ss, token, ',');
 
-        auto dfs = [&ss, &valStr](this auto self) -> TreeNode* {
+            if (token.front() == 'n') return nullptr;
             
-            getline(ss, valStr, ',');
+            TreeNode* node = new TreeNode(stoi(token), self(), self());
 
-            if (valStr.front() == 'N') return nullptr;
-
-            return new TreeNode(stoi(valStr), self(), self());
+            return node;
         };
 
-        return dfs();
+        return buildTree();
     }
 };
 
