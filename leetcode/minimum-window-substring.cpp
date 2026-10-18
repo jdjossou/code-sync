@@ -43,8 +43,6 @@ public:
 
                     if (window[index] == tCount[index]) ++have;
                 }
-
-                if (have != need) ++right;
             } else {
                 
                 if (right - left + 1 < len) {
@@ -56,15 +54,14 @@ public:
                 
                 if (tCount[index] > 0) {
                     --window[index];
-
-                    if (window[index] < tCount[index]) {
-                        --have;
-                        ++right;
-                    } 
+                    
+                    if (window[index] < tCount[index]) --have;
                 }
 
                 ++left;
             }
+
+            if (have != need) ++right;
         }
 
         return len == m + 1 ? "" : s.substr(start, len);
