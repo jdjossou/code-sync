@@ -1,59 +1,43 @@
 class Solution {
 public:
     bool exist(vector<vector<char>>& board, string word) {
-        for (int y = 0; y < board.size(); ++y) {
-            for (int x = 0; x < board.at(0).size(); ++x) {
-                if (backtrack(board, word, x, y, 0)) {
-                    return true;
+        int m = board.size();
+        int n = board.front().size();
+
+        int k = word.size();
+
+        if (k > m*n) return false;
+
+        const vector<pair<int,int>> DIR = {{0,-1},{0,1},{-1,0},{1,0}};
+
+        auto backtracking = [&](this auto self,int r, int c, int index) -> bool {
+            if (word[index] != board[r][c]) return false;
+            else if (index == k - 1) return true;
+            
+            board[r][c] = '0';
+
+            for (const auto& [dr,dc] : DIR) {
+                int newR = r + dr;
+                int newC = c + dc;
+
+                if (newR >= 0 && newR < m &&
+                    newC >= 0 && newC < n &&
+                    board[newR][newC] != '0') {
+                    if (self(newR, newC, index + 1)) return true;
                 }
+            }
+
+            board[r][c] = word[index];
+
+            return false;
+        };
+
+        for (int r = 0; r < m; ++r) {
+            for (int c = 0; c < n; ++c) {
+                if (backtracking(r,c,0)) return true;
             }
         }
 
         return false;
-    }
-
-    bool backtrack(vector<vector<char>>& board, const string& word, int x, int y, int index) {        
-        bool isExist = false;
-
-        if (board.at(y).at(x) == word.at(index)) {
-            
-            if (index + 1 == word.length()) {
-                return true;
-            }
-
-            board.at(y).at(x) = '.';
-                
-            // Right
-            ++x;
-            if (x < board.at(0).size()) {
-                isExist = backtrack(board, word, x, y, index + 1);
-            }
-            --x;
-
-            // Left
-            --x;
-            if (!isExist && x >= 0) {
-                isExist = backtrack(board, word, x, y, index + 1);
-            }
-            ++x;
-
-            // Bottom
-            ++y;
-            if (!isExist && y < board.size()) {
-                isExist = backtrack(board, word, x, y, index + 1);
-            }
-            --y;
-
-            // Top
-            --y;
-            if (!isExist && y >= 0) {
-                isExist = backtrack(board, word, x, y, index + 1);
-            }
-            ++y;
-
-            board.at(y).at(x) = word.at(index);
-        } 
-
-        return isExist;
     }
 };
