@@ -1,43 +1,31 @@
 class Solution {
-    
 public:
     bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        vector<vector<int>> pre(numCourses);
+        vector<vector<int>> adjLst(numCourses);
+        vector<int> indegree(numCourses);
 
-        for (const vector<int>& preq : prerequisites) {
-            pre.at(preq.at(0)).emplace_back(preq.at(1));
+        for (const vector<int>& prereq : prerequisites) {
+            adjLst[prereq[1]].emplace_back(prereq[0]);
+            ++indegree[prereq[0]];
         }
 
-        unordered_set<int> taken;
+        queue<int> noDep;
 
-        for (int course = 0; course < numCourses; ++course) {
-            if (!dfs(pre, taken, course)) {
-                return false;
+        for (int i = 0; i < numCourses; ++i) {
+            if (indegree[i] == 0) noDep.push(i);
+        }
+
+        int count = 0;
+
+        while (!noDep.empty()) {
+            for (int neighbor : adjLst[noDep.front()]) {
+                if (--indegree[neighbor] == 0) noDep.push(neighbor);
             }
+
+            noDep.pop();
+            ++count;
         }
 
-        return true;
-    }
-
-    bool dfs(vector<vector<int>>& pre, unordered_set<int>& taken, const int course) {
-        if (pre.at(course).empty()) {
-            return true;
-        }
-    
-        if (taken.contains(course)) {
-            return false;
-        }
-
-        taken.insert(course);
-
-        for (const int p : pre.at(course)) {
-            if (!dfs(pre, taken, p)) {
-                return false;
-            }
-        }
-
-        pre.at(course) = {};
-
-        return true;
+        return count == numCourses;
     }
 };
