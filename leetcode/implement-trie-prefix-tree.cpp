@@ -1,72 +1,55 @@
 class Trie {
 private:
-    vector<unique_ptr<Trie>> children;
+    struct Node {
+        array<unique_ptr<Node>, 26> children{};
+        bool isEnd = false;
+    };
 
-    int pos(const char c) const {
-        if (c == '$') return 26;
-
-        return c - 'a';
-    } 
+    unique_ptr<Node> root;
 
 public:
     Trie() {
-        for (int i = 0; i < 27; ++i) {
-            children.emplace_back(nullptr);
-        }
+        root = make_unique<Node>();
+        root->isEnd = true;
     }
     
     void insert(string word) {
-        word += "$";
+        auto helper = [&word](this auto self, Node* node, int index) {
+            if (index == word.size()) {
+                node->isEnd = true;
+                return ;
+            }
+            
+            int i = word[index] - 'a';
 
-        Trie* t = this;
+            if (node->children[i] == nullptr) {
+                node->children[i] = make_unique<Node>();
+            }
 
-        for (int i = 0; i < word.length(); ++i) {
-            const int p  = pos(word.at(i));
+            self(node->children[i].get(), index + 1);
+        };
 
-            if (t->children.at(p) == nullptr) {
-                t->children.at(p) = make_unique<Trie>();
-            } 
-
-            t = t->children.at(p).get();
-        }
+        helper(root.get(), 0);
     }
     
     bool search(string word) {
-        word += "$";
-
-        Trie* t = this;
-
-        for (int i = 0; i < word.length(); ++i) {
-            const char c = word.at(i);
-            const int p = pos(c);
-
-            if (t->children.at(p) == nullptr) {
-                return false;
-            } else if (c == '$') {
-                return true;
-            }  else {
-                t = t->children.at(p).get();
-            }
-        }
-
-        return false;
+        return find(word, root.get(), 0, true);
     }
     
     bool startsWith(string prefix) {
-        Trie* t = this;
-
-        for (int i = 0; i < prefix.length(); ++i) {
-            const int p = pos(prefix.at(i));
-
-            if (t->children.at(p) == nullptr) {
-                return false;
-            } else {
-                t = t->children.at(p).get();
-            }
-        }
-
-        return true;
+        return find(prefix, root.get(), 0, false);
     }
+
+    bool find(const string& word, Node* node, int index, bool isSearch) {
+        if (index == word.size()) return !isSearch || node->isEnd;
+        
+        int i = word[index] - 'a';
+
+        if (node->children[i] == nullptr) return false;
+
+        return find(word, node->children[i].get(), index + 1, isSearch);
+    };
+
 };
 
 /**
