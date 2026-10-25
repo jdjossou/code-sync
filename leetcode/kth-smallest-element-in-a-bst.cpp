@@ -10,27 +10,28 @@
  * };
  */
 class Solution {
-private:
-    int res;
 public:
     int kthSmallest(TreeNode* root, int k) {
-        dfs(root, k);
+        int res;
+
+        auto kth = [&k, &res](this auto self, TreeNode* node) -> void {
+            
+            if (node == nullptr || k < 0) return;
+
+            self(node->left);
+
+            --k;
+
+            if (k == 0) {
+                res = node->val;
+                return ;
+            }
+            
+            self(node->right);
+        };
+
+        kth(root);
         return res;
-    }
-
-    void dfs(TreeNode* root, int& k) {
-        if (!root || k == 0) return ;
-
-        dfs(root->left, k);
-
-        --k;
-
-        if (k == 0) {
-            res = root->val;
-            return ;
-        }
-
-        dfs(root->right, k);
-
+        
     }
 };
