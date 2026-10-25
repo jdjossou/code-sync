@@ -13,21 +13,20 @@ class Solution {
 public:
     vector<vector<int>> levelOrder(TreeNode* root) {
         vector<vector<int>> res;
-        helper(root, res, 0);
+        
+        auto traversal = [&res](this auto self, TreeNode* node, int level) -> void {
+            if (node == nullptr) return ;
+
+            if (res.size() == level) res.push_back({});
+
+            res[level].emplace_back(node->val);
+
+            self(node->left, level + 1);
+            self(node->right, level + 1);
+        };
+
+        traversal(root, 0);
 
         return res;
-    }
-
-    void helper(TreeNode* root, vector<vector<int>>& v, int level) {
-        if (!root) return ;
-
-        if (v.size() <= level) {
-            v.push_back({});
-        }
-
-        v.at(level).emplace_back(root->val);
-
-        helper(root->left, v, level + 1);
-        helper(root->right, v, level + 1);
     }
 };
