@@ -12,26 +12,23 @@
 class Solution {
 public:
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
-        return helper(preorder, inorder, 0, 0, inorder.size());
-    }
+        unordered_map<int,int> valToIdx;
+        int n = inorder.size();
 
-    TreeNode* helper(const vector<int>& preorder, const vector<int>& inorder, const int leftPre, const int leftIn, const int rightIn) {
-        if (leftIn >= rightIn) return nullptr;
+        for (int i = 0; i < n; ++i) valToIdx[inorder[i]] = i;
+        
+        auto build = [&](this auto self, int preIdx, int inStart, int inEnd) -> TreeNode* {
+            if (inStart > inEnd) return nullptr;
 
-        int index = leftIn;
+            int inIdx = valToIdx[preorder[preIdx]];
 
-        while (index < rightIn && inorder.at(index) != preorder.at(leftPre)) {
-            ++index;
-        }
+            return new TreeNode(
+                preorder[preIdx],
+                self(preIdx + 1, inStart, inIdx - 1),
+                self(preIdx + inIdx - inStart + 1, inIdx +1, inEnd)
+            );
+        };
 
-        TreeNode* root = new TreeNode(preorder.at(leftPre));
-
-        int leftSize = index - leftIn;
-
-        root->left = helper(preorder, inorder, leftPre + 1, leftIn, index);
-
-        root->right = helper(preorder, inorder, leftPre + 1 + leftSize, index + 1, rightIn);
-
-        return root;       
+        return build(0, 0, n - 1);
     }
 };
