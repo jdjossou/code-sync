@@ -10,31 +10,16 @@
  * };
  */
 class Solution {
+private:
+    bool isValid(TreeNode* node, long min, long max) {
+        if (node == nullptr) return true;
+        else if (node->val < min || node->val > max) return false;
+
+        return isValid(node->left, min, (long) node->val - 1) &&
+               isValid(node->right, (long) node->val + 1, max); 
+    }
 public:
-
     bool isValidBST(TreeNode* root) {
-        bool isFirst = true;
-        int last;
-
-        return dfs(root, last, isFirst);        
+        return isValid(root, INT_MIN, INT_MAX);
     }
-
-    bool dfs(TreeNode* root, int& last, bool& isFirst) {
-        if (!root) return true;
-
-        if (!dfs(root->left, last, isFirst)) return false;
-
-        if (isFirst) {
-            last = root->val;
-            isFirst = false;
-        } else if (last < root->val) {
-            last = root->val;
-        } else {
-            return false;
-        }
-        
-        return dfs(root->right, last, isFirst);
-    }
-    // 2, 1, 3
-
 };
