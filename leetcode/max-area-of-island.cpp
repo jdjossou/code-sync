@@ -2,37 +2,35 @@ class Solution {
 public:
     int maxAreaOfIsland(vector<vector<int>>& grid) {
         int maxArea = 0;
+        const vector<pair<int,int>> DIR = {{0,-1},{0,1},{-1,0},{1,0}};
 
-        for (int m = 0; m < grid.size(); ++m) {
-            for (int n = 0; n < grid.at(0).size(); ++n) {
-                if (grid.at(m).at(n) == 1) {
-                    maxArea = max(maxArea, findMaxArea(grid, m, n));
+        auto dfs = [&grid,&DIR](this auto self, int r, int c) -> int {
+            grid[r][c] = 0;
+
+            int total = 1;
+
+            for (const auto& [dr,dc] : DIR) {
+                int nr = r + dr;
+                int nc = c + dc;
+
+                if (nr >= 0 && nr < grid.size() &&
+                    nc >= 0 && nc < grid[0].size() &&
+                    grid[nr][nc] == 1) {
+                    total += self(nr,nc);
+                }
+            }
+
+            return total;
+        };
+
+        for (int r = 0; r < grid.size(); ++r) {
+            for (int c = 0; c < grid[0].size(); ++c) {
+                if (grid[r][c] == 1) {
+                    maxArea = max(maxArea, dfs(r,c));
                 }
             }
         }
 
         return maxArea;
-    }
-
-    int findMaxArea(vector<vector<int>>& grid, const int m, const int n) {
-        
-        if (m < 0 || m >= grid.size() || n < 0 || n >= grid.at(0).size() || grid.at(m).at(n) == 0) {
-            return 0;
-        }
-
-        int area = 1;
-
-        grid.at(m).at(n) = 0;
-
-        // LEFT
-        area += findMaxArea(grid, m - 1, n);
-        // RIGHT
-        area += findMaxArea(grid, m + 1, n);
-        // TOP
-        area += findMaxArea(grid, m, n - 1);
-        // DOWN
-        area += findMaxArea(grid, m, n + 1);
-
-        return area;        
     }
 };
