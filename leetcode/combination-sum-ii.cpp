@@ -1,35 +1,34 @@
 class Solution {
 public:
     vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+
+        int n = candidates.size();
+
         vector<vector<int>> res;
-        vector<int> comb;
+        vector<int> sub;
 
         sort(candidates.begin(), candidates.end());
+        
+        auto combine = [&](this auto self, int i, int t) -> void {
+            if (t == 0) {
+                res.push_back(sub);
+                return ;
+            } else if (t < 0 || i == n) {
+                return ;
+            } 
 
-        backtrack(candidates, target, res, comb, 0);
+            sub.emplace_back(candidates[i]);
+            self(i + 1, t - candidates[i]);
+            sub.pop_back();
+
+            while (i + 1 < n && candidates[i] == candidates[i + 1]) {
+                ++i;
+            }
+            self(i + 1, t);
+        };
+
+        combine(0, target);
 
         return res;
-    }
-
-    void backtrack(const vector<int>& candidates, int target, vector<vector<int>>& res, vector<int>& comb, int index) {
-        if (target < 0) {
-            return ;
-        } else if (target == 0) {
-            res.push_back(comb);
-            return ;
-        }
-
-        for (int i = index; i < candidates.size(); ++i) {
-            if (i > index && candidates.at(i) == candidates.at(i - 1)) {
-                continue;
-            }
-
-            if (candidates.at(i) > target) {
-                break;
-            }
-            comb.emplace_back(candidates.at(i));
-            backtrack(candidates, target - candidates.at(i), res, comb, i + 1);
-            comb.pop_back();
-        }
     }
 };
