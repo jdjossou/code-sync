@@ -1,38 +1,41 @@
 class Solution {
 public:
     void solve(vector<vector<char>>& board) {
+        
+        const vector<pair<int,int>> DIR = {{-1,0},{1,0},{0,1},{0,-1}};
+        int m = board.size();
+        int n = board[0].size();
+        
+        auto dfs = [&](this auto&& self, int r, int c) -> void {
+            board[r][c] = 'F';
 
-        for (int m = 0; m < board.size(); ++m) {
-            dfs(board, m, 0);
-            dfs(board, m, board.at(0).size() - 1);
-        }
+            for (const auto& [dr,dc] : DIR) {
+                int nr = r + dr;
+                int nc = c + dc;
 
-        for (int n = 0; n < board.at(0).size(); ++n) {
-            dfs(board, 0, n);
-            dfs(board, board.size() - 1, n);
-        }
-
-        for (int m = 0; m < board.size(); ++m) {
-            for (int n = 0; n < board.at(0).size(); ++n) {
-                if (board.at(m).at(n) == 'O') {
-                    board.at(m).at(n) = 'X';
-                } else if (board.at(m).at(n) == 'B') {
-                    board.at(m).at(n) = 'O';
+                if (nr >= 0 && nr < m &&
+                    nc >= 0 && nc < n &&
+                    board[nr][nc] == 'O') {
+                    self(nr,nc);
                 }
             }
-        }
-    }
-
-    void dfs(vector<vector<char>>& board, const int m, const int n) {
-
-        if (board.at(m).at(n) != 'O') return ;
-    
-        board.at(m).at(n) = 'B';
-
-        if (m > 0) dfs(board, m - 1, n);
-        if (m < board.size() - 1) dfs(board, m + 1, n);
-        if (n > 0) dfs(board, m, n - 1);
-        if (n < board.at(0).size() - 1) dfs(board, m, n + 1);
+        };
         
+        for (int r = 0; r < m; ++r) {
+            if (board[r][0] == 'O') dfs(r,0);
+            if (board[r][n - 1] == 'O') dfs(r, n - 1);
+        }
+
+        for (int c = 0; c < n; ++c) {
+            if (board[0][c] == 'O') dfs(0,c);
+            if (board[m - 1][c] == 'O') dfs(m - 1,c);
+        }
+
+        for (int r = 0; r < m; ++r) {
+            for (int c = 0; c < n; ++c) {
+                if (board[r][c] == 'F') board[r][c] = 'O';
+                else if (board[r][c] == 'O') board[r][c] = 'X';
+            }
+        }
     }
 };
