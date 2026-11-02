@@ -1,52 +1,34 @@
 class Solution {
 public:
     vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
-        vector<vector<int>> pre(numCourses);
-        vector<int> res;
+        vector<vector<int>> adjLst(numCourses);
+        vector<int> indegree(numCourses,0);
 
-        for (const vector<int>& prereq : prerequisites) {
-            pre.at(prereq.at(0)).emplace_back(prereq.at(1));
+        for (const vector<int>& pre : prerequisites) {
+            adjLst[pre[1]].emplace_back(pre[0]);
+            ++indegree[pre[0]];
         }
 
-        unordered_set<int> taken;
+        queue<int> noPre;
 
-        bool canFinish = true;
+        for (int i = 0; i < numCourses; ++i) {
+            if (indegree[i] == 0) noPre.push(i);
+        }
 
-        for (int course = 0; course < numCourses && canFinish; ++course) {
-            if (!dfs(pre, taken, course, res)) {
-                canFinish = false;
+        vector<int> ordering;
+
+        while (!noPre.empty()) {
+            ordering.emplace_back(noPre.front());
+
+            for (int neigh : adjLst[noPre.front()]) {
+                --indegree[neigh];
+                if (indegree[neigh] == 0) noPre.push(neigh);
             }
+
+            noPre.pop();
         }
 
-        if (!canFinish) res = {};
-
-        return res;
-    }
-
-    bool dfs(vector<vector<int>>& pre, unordered_set<int>& taken, const int course, vector<int>& res) {
-        if (pre.at(course).empty()) {
-            if (!taken.contains(course)) {
-                res.emplace_back(course);
-                taken.insert(course);
-            }
-            return true;
-        }
-
-        if (taken.contains(course)) {
-            return false;
-        }
-
-        taken.insert(course);
-
-        for (const int p : pre.at(course)) {
-            if (!dfs(pre, taken, p, res)) {
-                return false;
-            }
-        }
-
-        pre.at(course) = {};
-        res.emplace_back(course);
-
-        return true;
+        if (ordering.size() == numCourses) return ordering;
+        else return {};
     }
 };
