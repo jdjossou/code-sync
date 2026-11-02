@@ -1,41 +1,36 @@
 class Solution {
 public:
     vector<int> findRedundantConnection(vector<vector<int>>& edges) {
-        vector<vector<int>> graph(edges.size() + 1);
-
-        auto isConnected = [&graph](int u, int v) {
-            unordered_set<int> visited;
-            stack<int> stack;
-
-            stack.push(u);
-
-            while (!stack.empty()) {
-                const int node = stack.top();
-                stack.pop();
-
-                if (visited.contains(node)) continue;
-
-                visited.insert(node);
-
-                if (node == v) return true;
-
-                for (int neighbor : graph.at(node)) stack.push(neighbor);
-                
-            }
-
-            return false;
-        };
+        int n = edges.size();
+        vector<vector<int>> adjLst(n + 1);
+        vector<int> deg(n + 1);
 
         for (const vector<int>& edge : edges) {
-            const int u = edge.at(0);
-            const int v = edge.at(1);
-
-            if (isConnected(u, v)) return edge;
-            
-            graph.at(u).push_back(v);
-            graph.at(v).push_back(u);
+            adjLst[edge[0]].emplace_back(edge[1]);
+            adjLst[edge[1]].emplace_back(edge[0]);
         }
 
-        return {};
+        queue<int> leaves;
+
+        for (int i = 1; i <= n; ++i) {
+            deg[i] = adjLst[i].size();
+            if (deg[i] == 1) leaves.push(i);
+        }
+
+        while (!leaves.empty()) {
+            for (int neigh : adjLst[leaves.front()]) {
+                --deg[neigh];
+                if (deg[neigh] == 1) leaves.push(neigh);
+            }
+            leaves.pop();
+        }
+
+        vector<int> lastEdge;
+
+        for (const vector<int>& edge : edges) {
+            if (deg[edge[0]] > 1 && deg[edge[1]] > 1) lastEdge = edge;
+        }
+        
+        return lastEdge;
     }
 };
