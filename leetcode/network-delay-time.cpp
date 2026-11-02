@@ -1,44 +1,38 @@
 class Solution {
 public:
     int networkDelayTime(vector<vector<int>>& times, int n, int k) {
-        vector<int> dist(n + 1, 2e9);
-        vector<vector<pair<int, int>>> ajd(n + 1);
+        vector<vector<pair<int,int>>> adjLst(n + 1);
+        
+        for (const vector<int>& time : times) {
+            adjLst[time[0]].push_back({time[2], time[1]});
+        }
 
-        for (const vector<int> time : times) ajd.at(time.at(0)).emplace_back(time.at(2), time.at(1));
+        vector<int> dist(n + 1, INT_MAX);
+        vector<bool> visited(n + 1, false);
 
-        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
-        dist.at(k) = 0;
-        pq.emplace(0, k);
+        dist[k] = 0;
 
-        while (!pq.empty()) {
-            pair<int,int> top = pq.top();
-            pq.pop();
+        priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> minHeap;
 
-            int u = top.second;
-            int tu = top.first;
+        minHeap.push({dist[k], k});  
 
-            if (tu > dist.at(u)) continue;
+        while (!minHeap.empty()) {
+            const auto [d,node] = minHeap.top();
+            minHeap.pop();
+            visited[node] = true;
 
-            for (pair<int, int>& pv : ajd.at(u)) {
-
-                int v = pv.second;
-                int tv = pv.first;
-
-                if (dist.at(v) > dist.at(u) + tv) {
-                    dist.at(v) = dist.at(u) + tv;
-                    pq.emplace(dist.at(v), v);
+            for (const auto& [w,neigh] : adjLst[node]) {
+                if (w + d < dist[neigh]) {
+                    dist[neigh] = w + d;
+                    minHeap.push({dist[neigh],neigh});
                 }
-
             }
         }
 
-        int maxTime = dist.at(1);
+        int maxDist = dist[1];
 
-        for (int i = 2; i < dist.size(); ++i) {
-            maxTime = max(maxTime, dist.at(i));
-        }
-
-        return  maxTime == 2e9 ? -1 : maxTime;
+        for (int i = 2; i <= n; ++i) maxDist = max(maxDist, dist[i]);
         
+        return maxDist == INT_MAX ? -1 : maxDist;
     }
 };
