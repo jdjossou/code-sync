@@ -1,15 +1,18 @@
 class Solution {
 public:
     bool mergeTriplets(vector<vector<int>>& triplets, vector<int>& target) {
-        
-        vector<int> curr = {0, 0, 0};
-
-        for (const auto& triplet : triplets) {
-            if (triplet.at(0) <= target.at(0) && triplet.at(1) <= target.at(1) && triplet.at(2) <= target.at(2)) {
-                curr = {max(curr.at(0), triplet.at(0)), max(curr.at(1), triplet.at(1)), max(curr.at(2), triplet.at(2))};
+        for (const vector<int>& triplet : triplets) {
+            if (triplet[0] == target[0] && triplet[1] <= target[1] && triplet[2] <= target[2]) {
+                isFirst = true;
+            }
+            if (triplet[1] == target[1] && triplet[0] <= target[0] && triplet[2] <= target[2]) {
+                isSecond = true;
+            }
+            if (triplet[2] == target[2] && triplet[1] <= target[1] && triplet[0] <= target[0]) {
+                isThird = true;
             }
         }
 
-        return curr == target;
+        return isFirst && isSecond && isThird;
     }
 };
