@@ -8,8 +8,6 @@ public:
         }
 
         vector<int> dist(n + 1, INT_MAX);
-        vector<bool> visited(n + 1, false);
-
         dist[k] = 0;
 
         priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> minHeap;
@@ -19,7 +17,6 @@ public:
         while (!minHeap.empty()) {
             const auto [d,node] = minHeap.top();
             minHeap.pop();
-            visited[node] = true;
 
             for (const auto& [w,neigh] : adjLst[node]) {
                 if (w + d < dist[neigh]) {
