@@ -1,26 +1,24 @@
 class Solution {
 public:
     int jump(vector<int>& nums) {
-        int jumps = 0;
-        const int n = nums.size();
-        int farthest = 0;
-        int end = 0;
 
-        for (int i = 0; i < n - 1; ++i) {
-            if (nums[i] + i > farthest) {
-                farthest = nums[i] + i;
-            }
+        int n = nums.size();
 
-            if (i == end) {
-                ++jumps;
-                end = farthest;
+        int count = 0;
+        int jump = 0;
+        int maxJump = 0;
 
-                if (end >= n - 1) {
-                    break;
-                }
+        for (int left = 0; left < n; ++left) {
+            if (jump >= n - 1) break;
+
+            maxJump = max(maxJump, left + nums[left]);
+
+            if (left == jump) {
+                jump = maxJump;
+                ++count;
             }
         }
 
-        return jumps;
+        return count;
     }
 };
